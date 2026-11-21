@@ -12,13 +12,11 @@ export default async function RoundLayout({ children, params }: { children: Reac
   const { round, survey } = data;
   return (
     <main>
-      <p className="small">
+      <p className="small muted">
         <Link href="/organizer">調査一覧</Link> ／ <Link href={`/organizer/surveys/${survey.id}`}>{survey.name}</Link>
       </p>
-      <div className="row">
-        <h1 className="grow" style={{ marginBottom: 0 }}>
-          {survey.name}　{round.title || `第${round.roundNumber}回`}
-        </h1>
+      <div className="row page-heading">
+        <div className="grow"><span className="eyebrow">SURVEY ROUND</span><h1>{survey.name}　{round.title || `第${round.roundNumber}回`}</h1></div>
         <RoundBadge status={round.status} />
       </div>
       <RoundTabs roundId={round.id} />

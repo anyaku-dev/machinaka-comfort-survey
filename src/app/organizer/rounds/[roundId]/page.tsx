@@ -14,13 +14,13 @@ export default async function RoundOverview({ params }: { params: Promise<{ roun
   return (
     <>
       <div className="card">
-        <div className="row small">
-          <span>対象地：{survey.siteName || "未設定"}</span>
-          <span>実施主体：{survey.organizerName || "未設定"}</span>
-          <span>表示設問：{visibleCount} 問</span>
-          <span>提出：{submittedCount ?? 0} 件</span>
-          <span>開始：{fmtDateTime(round.startedAt)}</span>
-          <span>終了：{fmtDateTime(round.closedAt)}</span>
+        <div className="metric-grid">
+          <div className="metric"><span className="metric-label">対象地</span><strong className="metric-value">{survey.siteName || "未設定"}</strong></div>
+          <div className="metric"><span className="metric-label">実施主体</span><strong className="metric-value">{survey.organizerName || "未設定"}</strong></div>
+          <div className="metric"><span className="metric-label">表示設問</span><strong className="metric-value">{visibleCount} 問</strong></div>
+          <div className="metric"><span className="metric-label">提出</span><strong className="metric-value">{submittedCount ?? 0} 件</strong></div>
+          <div className="metric"><span className="metric-label">開始</span><strong className="metric-value">{fmtDateTime(round.startedAt)}</strong></div>
+          <div className="metric"><span className="metric-label">終了</span><strong className="metric-value">{fmtDateTime(round.closedAt)}</strong></div>
         </div>
         {round.snapshotHash && (
           <p className="muted small">

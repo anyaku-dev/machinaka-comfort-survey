@@ -378,7 +378,8 @@ export default function JoinApp() {
 
   const r = open?.round;
   const header = r && (
-    <div className="card small">
+    <div className="card small participant-header">
+      <span className="eyebrow">FIELD SURVEY</span>
       <strong>{r.surveyName}</strong> {r.title}
       <div className="muted">
         {r.siteName} ／ {r.surveyDate} {r.startTime ?? ""}～{r.endTime ?? ""}
@@ -473,6 +474,8 @@ export default function JoinApp() {
   );
 
   if (view.name === "home") {
+    const overall = progress(SECTIONS.filter((s) => s.key !== "observation").flatMap((s) => s.sections));
+    const progressPercent = overall.total > 0 ? Math.round((overall.done / overall.total) * 100) : 0;
     return (
       <main className="mobile">
         {netbar}
@@ -485,6 +488,12 @@ export default function JoinApp() {
             <div className="small">修正して再度提出してください。</div>
           </div>
         )}
+        <div className="progress-block" aria-label={`回答の進捗 ${overall.done}/${overall.total} 問`}>
+          <div className="row"><strong className="grow">回答の進捗</strong><strong>{overall.done}/{overall.total} 問</strong></div>
+          <div className="progress-track" role="progressbar" aria-valuenow={overall.done} aria-valuemin={0} aria-valuemax={Math.max(overall.total, 1)} aria-label="回答済みの設問数">
+            <span style={{ width: `${progressPercent}%` }} />
+          </div>
+        </div>
         <details className="card small">
           <summary>調査範囲・計測時間</summary>
           <p>
