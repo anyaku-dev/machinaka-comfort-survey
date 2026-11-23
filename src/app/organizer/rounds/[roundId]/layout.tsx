@@ -16,7 +16,7 @@ export default async function RoundLayout({ children, params }: { children: Reac
         <Link href="/organizer">調査一覧</Link> ／ <Link href={`/organizer/surveys/${survey.id}`}>{survey.name}</Link>
       </p>
       <div className="row page-heading">
-        <div className="grow"><span className="eyebrow">SURVEY ROUND</span><h1>{survey.name}　{round.title || `第${round.roundNumber}回`}</h1></div>
+        <div className="grow"><span className="eyebrow">調査回</span><h1>{survey.name}　{round.title || `第${round.roundNumber}回`}</h1></div>
         <RoundBadge status={round.status} />
       </div>
       <RoundTabs roundId={round.id} />

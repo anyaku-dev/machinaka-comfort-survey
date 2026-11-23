@@ -379,7 +379,7 @@ export default function JoinApp() {
   const r = open?.round;
   const header = r && (
     <div className="card small participant-header">
-      <span className="eyebrow">FIELD SURVEY</span>
+      <span className="eyebrow">現地調査</span>
       <strong>{r.surveyName}</strong> {r.title}
       <div className="muted">
         {r.siteName} ／ {r.surveyDate} {r.startTime ?? ""}～{r.endTime ?? ""}
@@ -513,7 +513,8 @@ export default function JoinApp() {
           </p>
           {r?.eventName && <p>イベント：{r.eventName}</p>}
         </details>
-        <nav className="section-list">
+        <h2 className="section-title">入力する項目</h2>
+        <nav className="section-list" aria-label="入力する項目">
           {SECTIONS.map((s) => {
             if (s.key === "observation") {
               if (!hasObservation) return null;

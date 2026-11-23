@@ -12,7 +12,7 @@ export default async function OrganizerHome() {
     <main>
       <div className="row page-heading">
         <div className="grow">
-          <span className="eyebrow">SURVEYS</span>
+          <span className="eyebrow">調査管理</span>
           <h1>調査一覧</h1>
           <p className="page-intro">調査と実施回の状況を確認できます。</p>
         </div>
@@ -23,7 +23,7 @@ export default async function OrganizerHome() {
       {error && <div className="alert alert-error">読み込みに失敗しました。</div>}
       {data && data.length === 0 && (
         <div className="card empty-state">
-          <span className="empty-icon" aria-hidden="true">✦</span>
+          <span className="eyebrow">はじめての調査</span>
           <h2>最初の調査を作成しましょう</h2>
           <p className="muted">調査を作成すると、実施回の設定や調査者の招待を進められます。</p>
         </div>
@@ -33,9 +33,9 @@ export default async function OrganizerHome() {
           {data.map((s) => (
             <article className="card survey-card" key={s.id}>
               <div>
-                <span className="eyebrow">SURVEY</span>
+                <span className="eyebrow">調査</span>
                 <h2><Link href={`/organizer/surveys/${s.id}`}>{s.name}</Link></h2>
-                <p className="site-line">⌖ {s.site_name || "対象地未設定"}</p>
+                <p className="site-line">対象地：{s.site_name || "未設定"}</p>
               </div>
               <div className="survey-rounds">
                 <span className="small muted">調査回</span>
