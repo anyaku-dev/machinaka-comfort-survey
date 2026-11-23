@@ -1,11 +1,13 @@
 import Link from "next/link";
 import LogoutButton from "@/components/logout-button";
+import NavigationProgress from "@/components/navigation-progress";
 import { requireOrganizer } from "@/lib/server/session";
 
 export default async function OrganizerLayout({ children }: { children: React.ReactNode }) {
   const { user } = await requireOrganizer();
   return (
     <>
+      <NavigationProgress />
       <header className="topbar">
         <Link className="brand" href="/organizer">
           <span className="brand-mark" aria-hidden="true">ま</span>

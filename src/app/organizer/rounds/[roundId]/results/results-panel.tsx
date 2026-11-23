@@ -148,10 +148,10 @@ export default function ResultsPanel({ roundId, stayMinutes, passMinutes }: { ro
     return (
       <div className="row" style={{ gap: 4, flexWrap: "nowrap" }}>
         <select
+          className="compact-select"
           aria-label={`${q.code} 代表値の状態`}
           value={e.state}
           onChange={(ev) => setEdits({ ...edits, [q.questionId]: { ...e, state: ev.target.value as RepEdit["state"] } })}
-          style={{ width: 90, padding: "0.3rem" }}
         >
           <option value="">未確定</option>
           <option value="value">値</option>

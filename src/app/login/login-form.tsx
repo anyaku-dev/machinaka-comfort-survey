@@ -35,7 +35,7 @@ export default function LoginForm({ next }: { next: string }) {
         <input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
       {error && <div className="alert alert-error">{error}</div>}
-      <button className="btn-primary btn-block" type="submit" disabled={busy}>
+      <button className="btn-primary btn-block" type="submit" disabled={busy} aria-busy={busy}>
         {busy ? "確認中…" : "ログイン"}
       </button>
     </form>

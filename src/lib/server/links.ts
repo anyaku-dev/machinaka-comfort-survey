@@ -1,9 +1,9 @@
 import "server-only";
 import QRCode from "qrcode";
-import { serverEnv } from "./env";
+import { appBaseUrl } from "./env";
 
 export function baseUrl(req: Request): string {
-  const configured = serverEnv().appBaseUrl;
+  const configured = appBaseUrl();
   if (configured) return configured;
   const proto = req.headers.get("x-forwarded-proto") ?? new URL(req.url).protocol.replace(":", "");
   const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? new URL(req.url).host;

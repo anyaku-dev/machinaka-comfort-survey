@@ -42,6 +42,10 @@ export function fromDbError(err: { message?: string; code?: string } | null | un
   if (err?.code === "42501" || /permission denied|row-level security/i.test(msg)) {
     return new ApiError(403, "forbidden", "権限がありません。");
   }
+  if (["PGRST202", "PGRST205", "42883", "42P01"].includes(err?.code ?? "")) {
+    console.error("[db schema]", err?.code, msg);
+    return new ApiError(503, "database_schema_missing", "必要なデータベース定義が見つかりません。接続先の Supabase とマイグレーションを確認してください。");
+  }
   if (err?.code === "23514" || err?.code === "22P02" || err?.code === "23502") {
     return new ApiError(422, "invalid", "入力値が不正です。");
   }

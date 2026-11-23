@@ -237,15 +237,15 @@ export default function QuestionEditor({ roundId, locked, questions }: { roundId
           <div className="sticky-bottom no-print">
             <div className="inner" style={{ maxWidth: 1200 }}>
               <span className="grow muted small">{dirty.length} 件の変更</span>
-              <button className="btn-primary" disabled={busy || dirty.length === 0} onClick={save} data-testid="save-questions">
-                設問設定を保存
+              <button className="btn-primary" disabled={busy || dirty.length === 0} aria-busy={busy} onClick={save} data-testid="save-questions">
+                {busy ? "保存中…" : "設問設定を保存"}
               </button>
             </div>
           </div>
           <form className="card" onSubmit={addCustom} style={{ marginBottom: "5rem" }}>
             <h2 style={{ marginTop: 0 }}>独自項目を追加</h2>
             <div className="row">
-              <div className="field">
+              <div className="field select-field">
                 <label htmlFor="c-section">区分</label>
                 <select
                   id="c-section"
@@ -259,7 +259,7 @@ export default function QuestionEditor({ roundId, locked, questions }: { roundId
                   ))}
                 </select>
               </div>
-              <div className="field">
+              <div className="field select-field">
                 <label htmlFor="c-kind">種類</label>
                 <select id="c-kind" value={custom.kind} onChange={(e) => setCustom({ ...custom, kind: e.target.value })}>
                   {CUSTOM_KINDS[custom.section].map((k) => (

@@ -164,8 +164,8 @@ export default function RoundSettingsForm({ round, locked }: { round: RoundRow; 
       </fieldset>
       {msg && <div className={`alert ${msg.kind === "ok" ? "alert-ok" : "alert-error"}`}>{msg.text}</div>}
       {!locked && (
-        <button className="btn-primary" type="submit" disabled={busy}>
-          設定を保存
+        <button className="btn-primary" type="submit" disabled={busy} aria-busy={busy}>
+          {busy ? "保存中…" : "設定を保存"}
         </button>
       )}
     </form>

@@ -61,7 +61,7 @@ export default function SurveyForm({ surveyId, initial }: { surveyId?: string; i
           <label htmlFor="siteName">対象地名</label>
           <input id="siteName" type="text" maxLength={200} value={v.siteName} onChange={set("siteName")} />
         </div>
-        <div className="field">
+        <div className="field select-field">
           <label htmlFor="siteType">対象地の種類</label>
           <select id="siteType" value={v.siteType} onChange={set("siteType")}>
             <option value="street">ストリート</option>
@@ -78,8 +78,8 @@ export default function SurveyForm({ surveyId, initial }: { surveyId?: string; i
         対象地の種類は新しい調査回を作るときの設問の初期表示に使います（ストリート以外では空間B「回遊」24～31を初期状態で非表示）。
       </p>
       {msg && <div className={`alert ${msg.kind === "ok" ? "alert-ok" : "alert-error"}`}>{msg.text}</div>}
-      <button className="btn-primary" type="submit" disabled={busy}>
-        {surveyId ? "保存" : "作成して調査回の設定へ"}
+      <button className="btn-primary" type="submit" disabled={busy} aria-busy={busy}>
+        {busy ? "保存中…" : surveyId ? "保存" : "作成して調査回の設定へ"}
       </button>
     </form>
   );

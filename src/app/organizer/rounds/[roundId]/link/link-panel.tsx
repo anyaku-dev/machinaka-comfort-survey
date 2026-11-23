@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/components/api-client";
+import { LoadingIndicator } from "@/components/loading-indicator";
 import { fmtDateTime } from "@/components/status";
 
 interface Link {
@@ -30,19 +31,29 @@ export default function LinkPanel({
   const [link, setLink] = useState<Link | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [lookupFailed, setLookupFailed] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const [pendingAction, setPendingAction] = useState<"issue" | "revoke" | null>(null);
   const [hours, setHours] = useState(24 * 14);
 
   useEffect(() => {
+    let current = true;
     api<{ link: Link | null }>(`/api/rounds/${roundId}/link`)
-      .then((r) => setLink(r.link))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoaded(true));
-  }, [roundId]);
+      .then((r) => { if (current) { setLink(r.link); setLookupFailed(false); } })
+      .catch((e) => { if (current) { setError(e.message); setLookupFailed(true); } })
+      .finally(() => { if (current) setLoaded(true); });
+    return () => { current = false; };
+  }, [roundId, loadAttempt]);
+
+  function retryLoad() {
+    setLoaded(false);
+    setError(null);
+    setLoadAttempt((n) => n + 1);
+  }
 
   async function issue() {
     if (link && !confirm("参加リンクを再発行します。配布済みのQRコード・URLは使えなくなります（入力途中の調査者も新しいQRで入り直す必要があります）。よろしいですか？")) return;
-    setBusy(true);
+    setPendingAction("issue");
     setError(null);
     try {
       const r = await api<{ link: Link }>(`/api/rounds/${roundId}/link`, "POST", { expiresInHours: hours });
@@ -51,12 +62,13 @@ export default function LinkPanel({
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setBusy(false);
+      setPendingAction(null);
     }
   }
   async function revoke() {
     if (!confirm("参加リンクを失効させます。よろしいですか？")) return;
-    setBusy(true);
+    setPendingAction("revoke");
+    setError(null);
     try {
       await api(`/api/rounds/${roundId}/link`, "DELETE");
       setLink(null);
@@ -64,7 +76,7 @@ export default function LinkPanel({
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setBusy(false);
+      setPendingAction(null);
     }
   }
 
@@ -73,6 +85,7 @@ export default function LinkPanel({
   return (
     <div className="stack">
       {status === "closed" && <div className="alert alert-info">調査は終了しています。参加リンクは失効しています。</div>}
+      {!loaded && <div className="card"><LoadingIndicator label="参加QRの状態を確認しています…" /></div>}
       {loaded && link && (
         <div className="card" style={{ textAlign: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -97,7 +110,7 @@ export default function LinkPanel({
           </p>
         </div>
       )}
-      {loaded && !link && status === "active" && <div className="alert alert-warn">有効な参加リンクがありません。発行してください。</div>}
+      {loaded && !link && !lookupFailed && status === "active" && <div className="alert alert-warn">有効な参加リンクがありません。発行してください。</div>}
       {status === "active" && (
         <div className="card row no-print">
           <label htmlFor="hours" className="small">
@@ -110,17 +123,17 @@ export default function LinkPanel({
             <option value={24 * 14}>14日</option>
             <option value={24 * 30}>30日</option>
           </select>
-          <button className="btn-primary" disabled={busy} onClick={issue} data-testid="issue-link">
-            {link ? "再発行（旧リンクを失効）" : "参加QRを発行"}
+          <button className="btn-primary" disabled={pendingAction !== null || !loaded || lookupFailed} onClick={issue} data-testid="issue-link">
+            {pendingAction === "issue" ? <><span className="loading-spinner button-spinner" aria-hidden="true" />発行中…</> : link ? "再発行（旧リンクを失効）" : "参加QRを発行"}
           </button>
           {link && (
-            <button className="btn-danger btn-small" disabled={busy} onClick={revoke}>
-              失効させる
+            <button className="btn-danger btn-small" disabled={pendingAction !== null} onClick={revoke}>
+              {pendingAction === "revoke" ? "失効中…" : "失効させる"}
             </button>
           )}
         </div>
       )}
-      {error && <div className="alert alert-error">{error}</div>}
+      {error && <div className="alert alert-error" role="alert">{error} {lookupFailed && <button className="btn-small" onClick={retryLoad}>再読み込み</button>}</div>}
       <div className="card no-print">
         <h3 style={{ marginTop: 0 }}>発行履歴</h3>
         <table>

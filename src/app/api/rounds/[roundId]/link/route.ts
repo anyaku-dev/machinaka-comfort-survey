@@ -1,5 +1,5 @@
 import { ApiError, fromDbError, json, must, readJson, withOrganizer } from "@/lib/server/api";
-import { serverEnv } from "@/lib/server/env";
+import { linkEncryptionKey, serverEnv } from "@/lib/server/env";
 import { baseUrl, joinUrl, qrDataUrl } from "@/lib/server/links";
 import { hashToken } from "@/lib/server/participant";
 import { decryptToken, encryptToken, generateToken } from "@/lib/security/token";
@@ -19,7 +19,7 @@ export async function GET(req: Request, { params }: Ctx) {
       .maybeSingle();
     if (error) throw fromDbError(error);
     if (!data) return json({ link: null });
-    const token = decryptToken(data.token_ciphertext, serverEnv().linkKey);
+    const token = decryptToken(data.token_ciphertext, linkEncryptionKey());
     const url = joinUrl(baseUrl(req), token);
     return json({
       link: {
@@ -41,20 +41,24 @@ export async function POST(req: Request, { params }: Ctx) {
   const { roundId } = await params;
   return withOrganizer(req, async ({ supabase }) => {
     const b = await readJson(req, linkIssueSchema);
+    // 設定不備なら DB にリンクを作る前に止める。発行後の 500 を防ぐ。
+    serverEnv();
+    const key = linkEncryptionKey();
     const token = generateToken();
+    const url = joinUrl(baseUrl(req), token);
+    const qr = await qrDataUrl(url);
     const expiresAt = new Date(Date.now() + b.expiresInHours * 3600_000).toISOString();
     const id = must(
       await supabase.rpc("issue_participant_link", {
         p_round_id: roundId,
         p_token_hash: hashToken(token),
-        p_token_ciphertext: encryptToken(token, serverEnv().linkKey),
+        p_token_ciphertext: encryptToken(token, key),
         p_expires_at: expiresAt,
         p_max_submissions: b.maxSubmissions,
         p_max_registrations: b.maxRegistrations,
       }),
     );
-    const url = joinUrl(baseUrl(req), token);
-    return json({ link: { id, url, qr: await qrDataUrl(url), expiresAt, expired: false, maxSubmissions: b.maxSubmissions, maxRegistrations: b.maxRegistrations } }, { status: 201 });
+    return json({ link: { id, url, qr, expiresAt, expired: false, maxSubmissions: b.maxSubmissions, maxRegistrations: b.maxRegistrations } }, { status: 201 });
   });
 }
 

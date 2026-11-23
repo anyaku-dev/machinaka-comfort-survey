@@ -16,6 +16,7 @@ import {
   type ParticipantQuestion,
 } from "@/lib/offline/local-store";
 import { observationProblems } from "@/lib/validation/schemas";
+import { LoadingIndicator } from "@/components/loading-indicator";
 import { QuestionInput } from "./inputs";
 import { ObservationEditor, summarize } from "./observation-editor";
 
@@ -356,7 +357,7 @@ export default function JoinApp() {
     </div>
   );
 
-  if (view.name === "loading") return <main className="mobile">読み込み中…</main>;
+  if (view.name === "loading") return <main className="mobile"><LoadingIndicator label="調査を読み込んでいます…" /></main>;
 
   if (view.name === "fatal") {
     return (

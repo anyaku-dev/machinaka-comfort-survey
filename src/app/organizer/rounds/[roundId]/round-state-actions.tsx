@@ -26,13 +26,14 @@ export default function RoundStateActions({ roundId, status, surveyId }: { round
           <button
             className="btn-primary"
             disabled={busy}
+            aria-busy={busy}
             data-testid="start-round"
             onClick={() => {
               if (!confirm("調査を開始します。開始後は設定・設問を変更できません（設定は固定されます）。よろしいですか？")) return;
               run(() => api(`/api/rounds/${roundId}/start`, "POST"), () => router.push(`/organizer/rounds/${roundId}/link`));
             }}
           >
-            調査を開始（設定を固定）
+            {busy ? "開始処理中…" : "調査を開始（設定を固定）"}
           </button>
         )}
         {status === "active" && (
